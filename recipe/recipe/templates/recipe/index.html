@@ -1,6 +1,7 @@
 <p><a href="{% url 'signup' %}">signup</a></p>
 <p><a href="{% url 'login' %}">login</a></p>
 {% if user.is_authenticated %}
+<p><a href="{% url 'favorites' %}">{{user.username}}'s favorites</a></p>
 <p><a href="{% url 'logout' %}">logout</a></p>
 {% endif %}
 <h1>Recipes:</h1>

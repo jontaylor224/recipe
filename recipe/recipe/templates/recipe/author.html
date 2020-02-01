@@ -1,5 +1,12 @@
 <h1>{{ author.name }}</h1>
-<p>{{ author.bio }}</p>
+
+{% if user.is_authenticated  %}
+    {% if user.id == author.id %}
+        <a href="{% url 'favorites' %}">Favorites</a>
+    {% endif %}
+{% endif %}
+
+
 <h4>Recipes:</h4>
 <ul>
     {% for recipe in author_recipe_list %}

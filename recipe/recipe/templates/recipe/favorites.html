@@ -1,0 +1,12 @@
+
+<div>
+    <h2>{{user.username}}'s favorite recipes:</h2>
+    <ul>
+        {% for favorite in favorites %}
+        <li>
+            <a href="{% url 'detail' favorite.id %}">{{favorite.title}}</a>
+        </li>
+        {% endfor %}
+    </ul>
+
+</div>

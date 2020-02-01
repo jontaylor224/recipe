@@ -41,18 +41,19 @@ def add_recipe(request):
 
 
 def index(request):
-    latest_recipe_list = Recipe.objects.order_by('title')
+    latest_recipe_list = Recipe.objects.all().order_by('title')
     context = {'latest_recipe_list': latest_recipe_list}
     return render(request, 'recipe/index.html', context)
 
 def detail(request, recipe_id):
     recipe = get_object_or_404(Recipe, pk=recipe_id)
-    return render(request, 'recipe/detail.html', {'recipe': recipe})
+    favorite_users = recipe.favorites.all()
+    return render(request, 'recipe/detail.html', {'recipe': recipe, 'favorites': favorite_users})
 
 def author(request, author_id):
     author = get_object_or_404(Author, pk=author_id)
     author_recipe_list = Recipe.objects.filter(author=author_id)
-    return render(request, 'recipe/author.html', 
+    return render(request, 'recipe/author.html',
         {'author': author, 'author_recipe_list':author_recipe_list}
     )
 
@@ -67,6 +68,10 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=raw_password)
             login(request, user)
+            Author.objects.create(
+                name=username,
+                user=user
+            )
             return HttpResponseRedirect('/')
     else:
         form = UserCreationForm()
@@ -76,3 +81,40 @@ def signup(request):
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect('/')
+
+
+@login_required
+def edit_recipe(request, recipe_id):
+    user = request.user
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    if (user.id == recipe.author.id or user.is_staff):
+        form = RecipeForm(request.POST or None, instance=recipe)
+        if form.is_valid():
+            # form.save()
+            form_data = form.cleaned_data
+            recipe.title = form_data['title']
+            recipe.author = form_data['author']
+            recipe.description = form_data['description']
+            recipe.time_req = form_data['time_req']
+            recipe.instructions = form_data['instructions']
+            recipe.save()
+        return render(request, 'recipe/add_recipe.html', {'form': form})
+    else:
+        favorite_users = recipe.favorites.all()
+        return render(request, 'recipe/detail.html', {'recipe': recipe, 'favorites': favorite_users})
+
+@login_required
+def favorite(request, recipe_id):
+    user_id=request.user.id
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    if recipe.favorites.filter(id=user_id).exists():
+        recipe.favorites.remove(request.user)
+    else:
+        recipe.favorites.add(request.user)
+    return HttpResponseRedirect(f'/{recipe_id}')
+
+
+def favorite_list(request):
+    user=request.user
+    favorites = user.favorite.all()
+    return render(request, 'recipe/favorites.html', {'favorites': favorites})

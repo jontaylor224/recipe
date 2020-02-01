@@ -9,3 +9,20 @@
 <h3>{{ recipe.title }}</h3>
 <h5>Time required: {{ recipe.time_req }}</h5>
 <p>Instructions: {{ recipe.instructions }}</p>
+
+<div>
+    {% if user.is_authenticated %}
+        <hr>
+        {% if user in favorites %}
+            <a href="{% url 'favorite' recipe.id %}">Remove from favorites</a>
+        {% else %}
+            <a href="{% url 'favorite' recipe.id %}">Add to favorites</a>
+        {% endif %}
+    {% endif %}
+</div>
+<div>
+    {% if user.is_authenticated %}
+        <hr>
+        <a href="{% url 'edit_recipe' recipe.id %}">Edit recipe</a>
+    {% endif %}
+</div>
