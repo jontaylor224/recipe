@@ -90,14 +90,8 @@ def edit_recipe(request, recipe_id):
     if (user.id == recipe.author.id or user.is_staff):
         form = RecipeForm(request.POST or None, instance=recipe)
         if form.is_valid():
-            # form.save()
-            form_data = form.cleaned_data
-            recipe.title = form_data['title']
-            recipe.author = form_data['author']
-            recipe.description = form_data['description']
-            recipe.time_req = form_data['time_req']
-            recipe.instructions = form_data['instructions']
-            recipe.save()
+            form.save()
+            return HttpResponseRedirect(f'/{recipe_id}')
         return render(request, 'recipe/add_recipe.html', {'form': form})
     else:
         favorite_users = recipe.favorites.all()
