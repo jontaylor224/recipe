@@ -1,4 +1,7 @@
 <h1>{{ author.name }}</h1>
+<h4>
+    <a href="/">Home</a>
+</h4>
 
 {% if user.is_authenticated  %}
     {% if user.id == author.id %}
